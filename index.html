@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>TOKU</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="TOKU">
+
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--ink:#111827;--muted:#6b7280;--line:#e5e7eb;--soft:#eef2f7;--good:#047857;--warn:#b45309;--bad:#b91c1c}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Yu Gothic",Meiryo,sans-serif}
+body{min-height:100vh}.app{max-width:820px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 14px calc(94px + env(safe-area-inset-bottom))}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px}.brand{font-size:28px;font-weight:850}.sub{font-size:12px;color:var(--muted);margin-top:2px}.badge{font-size:11px;background:var(--soft);padding:6px 9px;border-radius:999px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 1px 2px rgba(0,0,0,.03)}.hero{padding:20px}
+.label{font-size:12px;color:var(--muted);font-weight:750}.money{font-size:34px;font-weight:850;margin-top:5px}.money small{font-size:16px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.kpi{font-size:21px;font-weight:850}.mini,.meta{font-size:12px;color:var(--muted);line-height:1.55}
+.section-title{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:5px 2px 8px}.section-title h2{font-size:16px;margin:0}
+button{border:0;background:#111827;color:#fff;border-radius:12px;padding:10px 13px;font-weight:750;cursor:pointer;min-height:42px}button.secondary{background:var(--soft);color:#1f2937}
+input,select{width:100%;padding:11px 12px;border:1px solid #d1d5db;border-radius:11px;background:#fff;font-size:16px}
+.field{margin-bottom:12px}.field label{display:block;font-size:12px;font-weight:750;color:#4b5563;margin-bottom:6px}
+.task,.deal,.rowitem{padding:12px 0;border-top:1px solid var(--line)}.task:first-child,.deal:first-child,.rowitem:first-child{border-top:0}
+.task{display:grid;grid-template-columns:auto 1fr auto;gap:11px;align-items:center}.rank{width:30px;height:30px;border-radius:9px;background:var(--soft);display:grid;place-items:center;font-weight:850}
+.title{font-weight:780;font-size:14px}.value{font-weight:850;font-size:14px;text-align:right}.good{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+.rowitem,.deal-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.tag{display:inline-block;font-size:10px;border-radius:999px;padding:4px 7px;background:#ecfdf5;color:var(--good);margin-left:5px}
+.notice{padding:11px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;font-size:12px;line-height:1.65;margin-bottom:12px}.notice.good{background:#ecfdf5;border-color:#a7f3d0;color:#047857}
+.empty{padding:22px;text-align:center;color:var(--muted);font-size:13px}.paybox{padding:12px;border-radius:12px;background:#f3f4f6;font-size:12px;line-height:1.7;color:#374151}
+.tabs{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:10}.tabs-inner{max-width:820px;width:100%;display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom)}.tab{background:transparent;color:#6b7280;padding:10px 2px 8px;min-height:58px;font-size:10px}.tab b{display:block;font-size:18px;margin-bottom:3px}.tab.active{color:#111827;font-weight:850}.page{display:none}.page.active{display:block}
+dialog{border:0;border-radius:20px;padding:0;width:min(92vw,520px);box-shadow:0 24px 60px rgba(0,0,0,.22)}dialog::backdrop{background:rgba(17,24,39,.48)}.modal{padding:18px}.modal h3{margin:0 0 14px}.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+a{color:inherit}
+@media(max-width:520px){.grid2{grid-template-columns:1fr}.money{font-size:30px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div><div class="brand">TOKU</div><div class="sub">みれいが毎朝、最新のお得情報を確認。</div></div>
+    <div class="badge" id="freshBadge">確認中</div>
+  </div>
+
+  <section class="page active" id="home">
+    <div id="staleMsg"></div>
+    <div class="card hero">
+      <div class="label">今年、実際に得した額</div>
+      <div class="money" id="yearTotal">0 <small>円</small></div>
+      <div class="grid2" style="margin-top:12px">
+        <div><div class="mini">今月</div><div class="kpi" id="monthTotal">0円</div></div>
+        <div><div class="mini">まだ取れる得</div><div class="kpi" id="openTotal">0円</div></div>
+      </div>
+    </div>
+
+    <div class="section-title"><h2>今日やると得</h2><button class="secondary" id="addTaskBtn">＋追加</button></div>
+    <div class="card" id="taskList"></div>
+
+    <div class="section-title"><h2>みれい最新チェック</h2><span class="mini" id="updatedAt"></span></div>
+    <div class="card" id="dealMini"></div>
+  </section>
+
+  <section class="page" id="deals">
+    <div class="notice good">この一覧は毎朝自動更新されます。公式情報で期限・対象条件・上限・エントリー要否を確認したものだけを表示する設計です。</div>
+    <div class="card" id="dealList"></div>
+  </section>
+
+  <section class="page" id="buy">
+    <div class="card">
+      <div class="label">買い物メモ</div>
+      <div class="field" style="margin-top:12px"><label>商品名</label><input id="buyName" placeholder="例：ティップランロッド"></div>
+      <div class="grid2">
+        <div class="field"><label>価格</label><input id="buyPrice" type="number" min="0" placeholder="19800"></div>
+        <div class="field"><label>購入先</label><select id="buyStore"><option value="amazon">Amazon</option><option value="other">Amazon以外</option></select></div>
+      </div>
+      <div class="field"><label>最優先条件</label><input id="buyPriority" placeholder="例：折れにくさ、耐久性"></div>
+      <div class="paybox" id="payBox">基本支払い：<b>Amazonカード</b></div>
+      <button id="saveBuyBtn" style="margin-top:10px">購入候補に保存</button>
+    </div>
+    <div class="card" id="buyList"></div>
+  </section>
+
+  <section class="page" id="records">
+    <div class="section-title"><h2>得した記録</h2><button class="secondary" id="addRecordBtn">＋記録</button></div>
+    <div class="card" id="recordList"></div>
+  </section>
+</div>
+
+<nav class="tabs"><div class="tabs-inner">
+  <button class="tab active" data-page="home"><b>⌂</b>ホーム</button>
+  <button class="tab" data-page="deals"><b>★</b>お得</button>
+  <button class="tab" data-page="buy"><b>🛒</b>買う</button>
+  <button class="tab" data-page="records"><b>¥</b>記録</button>
+</div></nav>
+
+<dialog id="entryDialog"><form class="modal" id="entryForm">
+  <h3 id="entryTitle">追加</h3>
+  <div class="field"><label>内容</label><input id="entryName" required></div>
+  <div class="field"><label>金額</label><input id="entryValue" type="number" min="0" placeholder="0"></div>
+  <div class="field" id="deadlineWrap"><label>期限</label><input id="entryDeadline" type="date"></div>
+  <div class="modal-actions"><button type="button" class="secondary" id="entryCancel">キャンセル</button><button type="submit">保存</button></div>
+</form></dialog>
+
+<script>
+(() => {
+'use strict';
+const KEY='TOKU_GITHUB_V1';
+const today=()=>new Date().toISOString().slice(0,10);
+const ym=()=>today().slice(0,7);
+const yen=n=>new Intl.NumberFormat('ja-JP').format(Math.max(0,Number(n)||0))+'円';
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+let state;try{state=JSON.parse(localStorage.getItem(KEY))||{tasks:[],records:[],buys:[]}}catch(e){state={tasks:[],records:[],buys:[]}}
+let autoDeals={verified_at:'',deals:[]};
+function save(){localStorage.setItem(KEY,JSON.stringify(state));renderLocal()}
+function dayDiff(s){if(!s)return 9999;const a=new Date(today()+'T00:00:00Z'),b=new Date(s+'T00:00:00Z');return Math.round((b-a)/86400000)}
+function dtext(s){if(!s)return'期限なし';const d=dayDiff(s);if(d<0)return Math.abs(d)+'日超過';if(d===0)return'今日まで';if(d===1)return'明日まで';return'あと'+d+'日'}
+function go(id){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.page===id))}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>go(t.dataset.page)));
+
+let mode='task';const dlg=entryDialog;
+function openEntry(m){mode=m;entryTitle.textContent=m==='record'?'得した記録を追加':'今日やると得を追加';deadlineWrap.style.display=m==='record'?'none':'block';entryName.value='';entryValue.value='';entryDeadline.value='';dlg.showModal()}
+addTaskBtn.addEventListener('click',()=>openEntry('task'));addRecordBtn.addEventListener('click',()=>openEntry('record'));entryCancel.addEventListener('click',()=>dlg.close());
+entryForm.addEventListener('submit',e=>{e.preventDefault();const name=entryName.value.trim();if(!name)return;const x={id:Date.now(),name,value:Number(entryValue.value)||0,created:today()};if(mode==='task'){x.deadline=entryDeadline.value;state.tasks.push(x)}else{x.done_date=today();state.records.unshift(x)}dlg.close();save()});
+window.finishTask=id=>{const i=state.tasks.findIndex(x=>x.id===id);if(i<0)return;const [x]=state.tasks.splice(i,1);state.records.unshift({id:Date.now(),name:x.name,value:x.value||0,done_date:today()});save()};
+window.removeBuy=id=>{state.buys=state.buys.filter(x=>x.id!==id);save()};
+
+buyStore.addEventListener('change',()=>{payBox.innerHTML=buyStore.value==='amazon'?'基本支払い：<b>Amazonカード</b>':'基本支払い：<b>Recruit Card</b>'});
+saveBuyBtn.addEventListener('click',()=>{const name=buyName.value.trim();if(!name){alert('商品名を入れてください');return}state.buys.push({id:Date.now(),name,price:Number(buyPrice.value)||0,store:buyStore.value,priority:buyPriority.value.trim()});buyName.value='';buyPrice.value='';buyPriority.value='';save()});
+
+function renderLocal(){
+  const y=today().slice(0,4),yr=state.records.filter(x=>(x.done_date||'').startsWith(y)),mr=state.records.filter(x=>(x.done_date||'').startsWith(ym()));
+  const yt=yr.reduce((s,x)=>s+(+x.value||0),0),mt=mr.reduce((s,x)=>s+(+x.value||0),0),ot=state.tasks.reduce((s,x)=>s+(+x.value||0),0);
+  yearTotal.innerHTML=new Intl.NumberFormat('ja-JP').format(yt)+' <small>円</small>';monthTotal.textContent=yen(mt);openTotal.textContent=yen(ot);
+  const ts=[...state.tasks].sort((a,b)=>dayDiff(a.deadline)-dayDiff(b.deadline)).slice(0,4);
+  taskList.innerHTML=ts.length?ts.map((x,i)=>`<div class="task"><div class="rank">${i+1}</div><div><div class="title">${esc(x.name)}</div><div class="meta">${dtext(x.deadline)}</div></div><div><div class="value">${x.value?'＋'+yen(x.value):'確認'}</div><button class="secondary" style="padding:6px 9px;min-height:32px;margin-top:5px;font-size:11px" onclick="finishTask(${x.id})">完了</button></div></div>`).join(''):'<div class="empty">今日は取りこぼしなし。</div>';
+  recordList.innerHTML=state.records.length?state.records.map(x=>`<div class="rowitem"><div><div class="title">${esc(x.name)}</div><div class="meta">${esc(x.done_date||'')}</div></div><div class="value good">＋${yen(x.value)}</div></div>`).join(''):'<div class="empty">まだ記録はありません。</div>';
+  buyList.innerHTML=state.buys.length?[...state.buys].reverse().map(x=>`<div class="rowitem"><div><div class="title">${esc(x.name)}</div><div class="meta">${x.store==='amazon'?'Amazon・Amazonカード':'Amazon以外・Recruit Card'}${x.priority?'・重視 '+esc(x.priority):''}</div></div><div style="text-align:right"><div class="value">${x.price?yen(x.price):'価格未入力'}</div><button class="secondary" style="padding:6px 9px;min-height:32px;margin-top:5px;font-size:11px" onclick="removeBuy(${x.id})">削除</button></div></div>`).join(''):'<div class="empty">購入候補はありません。</div>';
+}
+function dealHtml(d){return `<div class="deal"><div class="deal-head"><div><div class="title">${esc(d.title||'お得情報')}<span class="tag">公式確認済</span></div><div class="meta">${esc(d.summary||'')}</div></div><div class="value">${d.value?'最大 '+yen(d.value):''}</div></div><div class="meta">${esc(d.provider||'')}${d.end_date?'・期限 '+esc(d.end_date):''}</div>${d.conditions?`<div class="meta">条件：${esc(d.conditions)}</div>`:''}${d.source_url?`<div class="meta"><a target="_blank" rel="noopener" href="${esc(d.source_url)}">公式ページ</a></div>`:''}</div>`}
+function renderDeals(){
+  const ds=Array.isArray(autoDeals.deals)?autoDeals.deals:[];
+  dealList.innerHTML=ds.length?ds.map(dealHtml).join(''):'<div class="empty">まだ自動更新データがありません。</div>';
+  dealMini.innerHTML=ds.length?ds.slice(0,3).map(dealHtml).join(''):'<div class="empty">まだ自動更新データがありません。</div>';
+  updatedAt.textContent=autoDeals.verified_at?'最終確認 '+autoDeals.verified_at:'';
+  const age=autoDeals.verified_at?Math.abs(dayDiff(autoDeals.verified_at)):9999;
+  if(age<=1){freshBadge.textContent='最新';freshBadge.style.color='var(--good)';staleMsg.innerHTML=''}
+  else{freshBadge.textContent='要更新';freshBadge.style.color='var(--warn)';staleMsg.innerHTML='<div class="notice">最新確認から時間が経っています。自動更新処理を確認してください。</div>'}
+}
+async function loadDeals(){
+  try{
+    const r=await fetch('deals.json?ts='+Date.now(),{cache:'no-store'});
+    if(!r.ok)throw new Error();
+    autoDeals=await r.json();
+  }catch(e){autoDeals={verified_at:'',deals:[]}}
+  renderDeals();
+}
+renderLocal();loadDeals();
+
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+}
+
+})();
+</script>
+</body>
+</html>
