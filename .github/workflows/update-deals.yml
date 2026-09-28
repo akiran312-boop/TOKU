@@ -1,0 +1,40 @@
+name: TOKU 毎朝お得情報更新
+
+on:
+  schedule:
+    # 日本時間 7:15 = UTC 前日22:15
+    - cron: "15 22 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: リポジトリ取得
+        uses: actions/checkout@v4
+
+      - name: Python設定
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 最新お得情報を検索
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python scripts/update_deals.py
+
+      - name: 更新を保存
+        run: |
+          git config user.name "TOKU bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add deals.json
+          if git diff --cached --quiet; then
+            echo "変更なし"
+          else
+            git commit -m "Update TOKU deals"
+            git push
+          fi
